@@ -27,8 +27,8 @@ const config: Config = {
         },
       },
       fontFamily: {
-        heading: ['Space Grotesk', 'sans-serif'],
-        body: ['Inter', 'sans-serif'],
+        heading: ['var(--font-heading)', 'sans-serif'],
+        body: ['var(--font-body)', 'sans-serif'],
       },
       animation: {
         'float': 'float 6s ease-in-out infinite',
