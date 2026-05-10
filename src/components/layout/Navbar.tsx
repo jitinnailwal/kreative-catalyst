@@ -6,11 +6,18 @@ import { gsap } from 'gsap';
 import Image from 'next/image';
 
 const navLinks = [
-  { name: 'About', href: '#about' },
+  { name: 'About', href: '/#about' },
   { name: 'Services', href: '/services' },
-  { name: 'Work', href: '/work' },
-  { name: 'Blog', href: '#blog' },
-  { name: 'Contact', href: '#contact' },
+  {
+    name: 'Work',
+    href: '/work',
+    dropdown: [
+      { name: 'Case Studies', href: '/work#case-studies' },
+      { name: 'Triple Play Model', href: '/work#triple-play' },
+    ],
+  },
+  { name: 'Blog', href: '/#blog' },
+  { name: 'Contact', href: '/#contact' },
 ];
 
 function ScatteredLogo() {
@@ -121,15 +128,123 @@ function ScatteredLogo() {
   );
 }
 
+// Book A Free Call Modal
+function BookCallModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const [formData, setFormData] = useState({ name: '', email: '', query: '' });
+  const [status, setStatus] = useState<'idle' | 'sending' | 'sent'>('idle');
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setStatus('sending');
+    setTimeout(() => {
+      setStatus('sent');
+      setFormData({ name: '', email: '', query: '' });
+      setTimeout(() => {
+        setStatus('idle');
+        onClose();
+      }, 2000);
+    }, 1000);
+  };
+
+  return (
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.25 }}
+          className="fixed inset-0 z-[2000] flex items-center justify-center px-4"
+          onClick={onClose}
+        >
+          {/* Backdrop */}
+          <div className="absolute inset-0 bg-dark-900/70 backdrop-blur-sm" />
+
+          {/* Card */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9, y: 30 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: 30 }}
+            transition={{ duration: 0.3, ease: 'easeOut' }}
+            className="relative glass-strong rounded-2xl p-6 sm:p-8 w-full max-w-md"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close button */}
+            <button
+              onClick={onClose}
+              className="absolute top-4 right-4 w-8 h-8 rounded-full glass flex items-center justify-center text-light-300/60 hover:text-light transition-colors"
+              data-cursor="pointer"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M18 6L6 18M6 6l12 12" />
+              </svg>
+            </button>
+
+            <h3 className="font-heading font-bold text-xl mb-1">Book A Free Call</h3>
+            <p className="text-sm text-light-300/50 mb-6">Tell us about your project and we&apos;ll get back to you within 24 hours.</p>
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <input
+                type="text"
+                placeholder="Your Name"
+                required
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                className="w-full px-4 py-3 rounded-lg bg-dark-800 border border-dark-700/50 text-sm text-light placeholder:text-light-300/30 focus:outline-none focus:border-accent-blue/30 transition-colors"
+              />
+              <input
+                type="email"
+                placeholder="Email Address"
+                required
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                className="w-full px-4 py-3 rounded-lg bg-dark-800 border border-dark-700/50 text-sm text-light placeholder:text-light-300/30 focus:outline-none focus:border-accent-blue/30 transition-colors"
+              />
+              <textarea
+                placeholder="Your Query"
+                rows={3}
+                required
+                value={formData.query}
+                onChange={(e) => setFormData({ ...formData, query: e.target.value })}
+                className="w-full px-4 py-3 rounded-lg bg-dark-800 border border-dark-700/50 text-sm text-light placeholder:text-light-300/30 focus:outline-none focus:border-accent-blue/30 transition-colors resize-none"
+              />
+              <button
+                type="submit"
+                disabled={status === 'sending'}
+                className="w-full px-6 py-3 rounded-lg bg-gradient-to-r from-accent-blue to-accent-gold text-dark-900 font-semibold text-sm hover:shadow-lg hover:shadow-accent-blue/20 transition-all duration-300 disabled:opacity-50"
+                data-cursor="pointer"
+              >
+                {status === 'sending' ? 'Submitting...' : status === 'sent' ? 'Submitted!' : 'Submit'}
+              </button>
+            </form>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [callModalOpen, setCallModalOpen] = useState(false);
+  const [workDropdownOpen, setWorkDropdownOpen] = useState(false);
+  const dropdownTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const handleDropdownEnter = () => {
+    if (dropdownTimeoutRef.current) clearTimeout(dropdownTimeoutRef.current);
+    setWorkDropdownOpen(true);
+  };
+
+  const handleDropdownLeave = () => {
+    dropdownTimeoutRef.current = setTimeout(() => setWorkDropdownOpen(false), 200);
+  };
 
   return (
     <>
@@ -149,7 +264,7 @@ export default function Navbar() {
           >
             <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between">
               {/* Logo */}
-              <a href="#" className="flex items-center gap-3 group" data-cursor="pointer">
+              <a href="/" className="flex items-center gap-3 group" data-cursor="pointer">
                 <Image
                   src="/KC_Logo.jpeg"
                   alt="Kreative Catalyst"
@@ -163,21 +278,70 @@ export default function Navbar() {
               {/* Desktop Links */}
               <div className="hidden md:flex items-center gap-8">
                 {navLinks.map((link, i) => (
-                  <motion.a
-                    key={link.name}
-                    href={link.href}
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.7 + i * 0.1 }}
-                    className="text-sm text-light-300 hover:text-light transition-colors relative group"
-                    data-cursor="pointer"
-                  >
-                    {link.name}
-                    <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-accent-blue group-hover:w-full transition-all duration-300" />
-                  </motion.a>
+                  'dropdown' in link && link.dropdown ? (
+                    // Work link with dropdown
+                    <motion.div
+                      key={link.name}
+                      initial={{ opacity: 0, y: -20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.7 + i * 0.1 }}
+                      className="relative"
+                      onMouseEnter={handleDropdownEnter}
+                      onMouseLeave={handleDropdownLeave}
+                    >
+                      <a
+                        href={link.href}
+                        className="text-sm text-light-300 hover:text-light transition-colors relative group inline-flex items-center gap-1"
+                        data-cursor="pointer"
+                      >
+                        {link.name}
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={`transition-transform duration-200 ${workDropdownOpen ? 'rotate-180' : ''}`}>
+                          <polyline points="6 9 12 15 18 9" />
+                        </svg>
+                        <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-accent-blue group-hover:w-full transition-all duration-300" />
+                      </a>
+
+                      <AnimatePresence>
+                        {workDropdownOpen && (
+                          <motion.div
+                            initial={{ opacity: 0, y: 8 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 8 }}
+                            transition={{ duration: 0.2 }}
+                            className="absolute top-full left-1/2 -translate-x-1/2 mt-3 glass-strong rounded-xl py-2 min-w-[200px] border border-dark-700/30"
+                          >
+                            {link.dropdown.map((item) => (
+                              <a
+                                key={item.name}
+                                href={item.href}
+                                className="block px-4 py-2.5 text-sm text-light-300/70 hover:text-light hover:bg-accent-blue/5 transition-all"
+                                data-cursor="pointer"
+                              >
+                                {item.name}
+                              </a>
+                            ))}
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </motion.div>
+                  ) : (
+                    // Regular link
+                    <motion.a
+                      key={link.name}
+                      href={link.href}
+                      initial={{ opacity: 0, y: -20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.7 + i * 0.1 }}
+                      className="text-sm text-light-300 hover:text-light transition-colors relative group"
+                      data-cursor="pointer"
+                    >
+                      {link.name}
+                      <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-accent-blue group-hover:w-full transition-all duration-300" />
+                    </motion.a>
+                  )
                 ))}
-                <motion.a
-                  href="#contact"
+                <motion.button
+                  onClick={() => setCallModalOpen(true)}
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 1.2 }}
@@ -185,7 +349,7 @@ export default function Navbar() {
                   data-cursor="pointer"
                 >
                   Book A Free Call
-                </motion.a>
+                </motion.button>
               </div>
 
               {/* Mobile Menu Button */}
@@ -242,7 +406,7 @@ export default function Navbar() {
             </div>
 
             {/* Menu content centered */}
-            <div className="flex-1 flex flex-col items-center justify-center gap-8">
+            <div className="flex-1 flex flex-col items-center justify-center gap-6">
               <Image
                 src="/KreativeCatalystCrop_Logo.jpeg"
                 alt="Kreative Catalyst"
@@ -251,22 +415,49 @@ export default function Navbar() {
                 className="rounded-lg mb-4"
               />
               {navLinks.map((link, i) => (
-                <motion.a
-                  key={link.name}
-                  href={link.href}
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.1 }}
-                  onClick={() => setMobileOpen(false)}
-                  className="text-2xl font-heading font-semibold text-light hover:text-accent-blue transition-colors"
-                >
-                  {link.name}
-                </motion.a>
+                <div key={link.name} className="text-center">
+                  <motion.a
+                    href={link.href}
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.1 }}
+                    onClick={() => setMobileOpen(false)}
+                    className="text-2xl font-heading font-semibold text-light hover:text-accent-blue transition-colors"
+                  >
+                    {link.name}
+                  </motion.a>
+                  {'dropdown' in link && link.dropdown && (
+                    <div className="mt-2 space-y-1">
+                      {link.dropdown.map((item) => (
+                        <a
+                          key={item.name}
+                          href={item.href}
+                          onClick={() => setMobileOpen(false)}
+                          className="block text-sm text-light-300/50 hover:text-accent-blue transition-colors"
+                        >
+                          {item.name}
+                        </a>
+                      ))}
+                    </div>
+                  )}
+                </div>
               ))}
+              <motion.button
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+                onClick={() => { setMobileOpen(false); setCallModalOpen(true); }}
+                className="mt-4 px-8 py-3 rounded-full text-sm font-medium bg-gradient-to-r from-accent-blue to-accent-gold text-dark-900"
+              >
+                Book A Free Call
+              </motion.button>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Book A Free Call Modal */}
+      <BookCallModal open={callModalOpen} onClose={() => setCallModalOpen(false)} />
     </>
   );
 }

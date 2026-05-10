@@ -173,7 +173,7 @@ export default function WorkPage() {
         </section>
 
         {/* Case Studies */}
-        <section className="py-8 md:py-16 px-4 sm:px-6">
+        <section id="case-studies" className="py-8 md:py-16 px-4 sm:px-6 scroll-mt-24">
           <div className="max-w-6xl mx-auto">
             <motion.div
               initial={{ opacity: 0 }}
@@ -229,7 +229,7 @@ export default function WorkPage() {
         </section>
 
         {/* Triple Play Model */}
-        <section className="py-16 md:py-32 px-4 sm:px-6">
+        <section id="triple-play" className="py-16 md:py-32 px-4 sm:px-6 scroll-mt-24">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-10 md:mb-16">
               <motion.span
