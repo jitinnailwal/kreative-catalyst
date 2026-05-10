@@ -13,10 +13,15 @@ const footerLinks = {
     { name: 'Website Development', href: '/services' },
   ],
   Company: [
-    { name: 'About', href: '#about' },
+    { name: 'About Us', href: '/about' },
     { name: 'Our Work', href: '/work' },
-    { name: 'Blog', href: '#blog' },
-    { name: 'Contact', href: '#contact' },
+    { name: 'Blog', href: '/#blog' },
+    { name: 'Contact', href: '/#contact' },
+  ],
+  'Locations We Serve': [
+    { name: 'Digital Marketing Agency in Delhi', href: '/about' },
+    { name: 'Digital Marketing Agency in Varanasi', href: '/about' },
+    { name: 'Digital Marketing Agency in Bangalore', href: '/about' },
   ],
   Connect: [
     { name: 'Instagram', href: '#' },
@@ -30,7 +35,7 @@ export default function Footer() {
   return (
     <footer className="relative pt-12 md:pt-20 pb-8 px-4 sm:px-6 border-t border-dark-700/30">
       <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-12 mb-12 md:mb-16">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 sm:gap-10 mb-12 md:mb-16">
           {/* Brand */}
           <div className="col-span-2 lg:col-span-1">
             <div className="flex items-center gap-3 mb-4">

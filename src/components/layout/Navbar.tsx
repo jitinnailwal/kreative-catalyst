@@ -6,7 +6,7 @@ import { gsap } from 'gsap';
 import Image from 'next/image';
 
 const navLinks = [
-  { name: 'About', href: '/#about' },
+  { name: 'About', href: '/about' },
   { name: 'Services', href: '/services' },
   {
     name: 'Work',
